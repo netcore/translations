@@ -1,0 +1,31 @@
+{
+    "name": "netcore/laravel-translations-in-database",
+    "description": "Laravel translations stored in database for easy CRUD",
+    "license": "MIT",
+    "keywords": ["laravel", "cache", "database"],
+    "authors": [
+        {
+            "name": "Netcore.lv",
+            "email": "kristers.zarins@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "illuminate/translation": "^5.3",
+        "illuminate/database": "^5.3",
+        "illuminate/cache": "^5.3",
+        "illuminate/routing": "^5.3",
+        "illuminate/support": "^5.3"
+    },
+    "autoload": {
+        "files": [
+            "src/helpers.php"
+        ],
+        "psr-4": {
+            "Netcore\\Translator\\": "src"
+        }
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^6.0"
+    }
+}
