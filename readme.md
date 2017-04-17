@@ -15,7 +15,7 @@ store all translations in a database. Benefits of this are:
 
 Require this package with composer:
 
-composer require netcore/laravel-translations-in-database --dev
+    composer require netcore/laravel-translations-in-database --dev
 
 Add our service provider to "providers" array in config/app.php:
 
