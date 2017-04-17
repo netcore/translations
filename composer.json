@@ -5,8 +5,9 @@
     "keywords": ["laravel", "cache", "database"],
     "authors": [
         {
-            "name": "Netcore.lv",
-            "email": "kristers.zarins@gmail.com"
+            "name": "Kristers Zariņš",
+            "email": "kristers.zarins@gmail.com",
+            "role": "developer"
         }
     ],
     "minimum-stability": "dev",
