@@ -13,7 +13,7 @@ class LanguagesController extends Controller
      *
      * @var String
      */
-    private $viewNamespace = 'laravel-translations-in-database::languages';
+    private $viewNamespace = 'translations::languages';
 
     /**
      *
@@ -26,7 +26,7 @@ class LanguagesController extends Controller
      */
     public function __construct()
     {
-        $cacheTag = config('laravel_translations_in_database.languages_cache_tag');
+        $cacheTag = config('translations.languages_cache_tag');
         if($cacheTag AND function_exists($cacheTag)) {
             $this->cacheTag = $cacheTag();
         }

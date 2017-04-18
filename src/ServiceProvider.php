@@ -38,40 +38,40 @@ class ServiceProvider extends TranslationServiceProvider
         });
 
         // Views
-        $this->loadViewsFrom(__DIR__.'/views', 'laravel-translations-in-database');
+        $viewNamespace = 'translations';
+        $this->loadViewsFrom(__DIR__.'/views', $viewNamespace);
 
         // Default config
         $this->mergeConfigFrom(
-            __DIR__.'/config/laravel_translations_in_database.php',
-            'laravel_translations_in_database'
+            __DIR__.'/config/translations.php',
+            'translations'
         );
 
         // Publish config to override defaults
         $this->publishes([
-            __DIR__.'/config/laravel_translations_in_database.php' => config_path('laravel_translations_in_database.php'),
+            __DIR__.'/config/translations.php' => config_path('translations.php'),
         ], 'config');
 
         // Migrations
         $this->loadMigrationsFrom(__DIR__.'/migrations');
         
         // View composers
-        $viewNamespace = 'laravel-translations-in-database';
         view()->composer($viewNamespace.'::*', function(View $view) use ($viewNamespace) {
             $view->with(compact('viewNamespace'));
         });
         
         view()->composer($viewNamespace.'::languages.*', function(View $view) {
-            $uiTranslations = config('laravel_translations_in_database.ui_translations.languages', []);
+            $uiTranslations = config('translations.ui_translations.languages', []);
             $view->with(compact('uiTranslations'));
         });
         
         view()->composer($viewNamespace.'::translations.*', function(View $view) {
-            $uiTranslations = config('laravel_translations_in_database.ui_translations.translations', []);
+            $uiTranslations = config('translations.ui_translations.translations', []);
             $view->with(compact('uiTranslations'));
         });
         
         view()->composer($viewNamespace.'::partials.*', function(View $view) {
-            $uiTranslations = config('laravel_translations_in_database.ui_translations.partials', []);
+            $uiTranslations = config('translations.ui_translations.partials', []);
             $view->with(compact('uiTranslations'));
         });
     }

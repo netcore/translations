@@ -14,7 +14,7 @@ class TranslationsController extends Controller
      *
      * @var String
      */
-    private $viewNamespace = 'laravel-translations-in-database::translations';
+    private $viewNamespace = 'translations::translations';
 
     /**
      * @param null $group
@@ -72,12 +72,12 @@ class TranslationsController extends Controller
             return (object)$item;
         })->sortBy('group');
 
-        $uiTranslations = config('laravel_translations_in_database.ui_translations.translations', []);
+        $uiTranslations = config('translations.ui_translations.translations', []);
 
         $groups = ['' => array_get($uiTranslations, 'all_groups')] + $groups->pluck('group', 'group')->toArray();
 
-        $extends = config('laravel_translations_in_database.extends', 'layouts.admin');
-        $section = config('laravel_translations_in_database.section', 'layouts.content');
+        $extends = config('translations.extends', 'layouts.admin');
+        $section = config('translations.section', 'layouts.content');
 
         return view($this->viewNamespace . '.index', compact(
             'fromLocale',
@@ -136,7 +136,7 @@ class TranslationsController extends Controller
                 ->toArray();
         } catch (\Exception $e) {
 
-            $uiTranslations = config('laravel_translations_in_database.ui_translations', []);
+            $uiTranslations = config('translations.ui_translations', []);
             $error = array_get($uiTranslations, 'couldnt-import-excel');
 
             return redirect()->back()->withError($error);
@@ -145,7 +145,7 @@ class TranslationsController extends Controller
         $translation = new Translation();
         $translation->import()->process($all_data);
 
-        $uiTranslations = config('laravel_translations_in_database.ui_translations', []);
+        $uiTranslations = config('translations.ui_translations', []);
         $msg = array_get($uiTranslations, 'translations-have-been-imported');
 
         return redirect()->back()->withSuccess($msg);

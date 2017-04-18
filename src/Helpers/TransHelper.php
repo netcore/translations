@@ -15,7 +15,7 @@ class TransHelper
 
         $defaultKeyInSession = config('app.locale');
 
-        $keyInSession = config('laravel_translations_in_database.locale_iso_key_in_session', 'locale');
+        $keyInSession = config('translations.locale_iso_key_in_session', 'locale');
         if($keyInSession AND function_exists($keyInSession)) {
             $keyInSession = $keyInSession();
         } else {

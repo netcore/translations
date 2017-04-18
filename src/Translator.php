@@ -64,7 +64,7 @@ class Translator extends \Illuminate\Translation\Translator
 
         if (!self::$staticCacheAllTranslations) {
 
-            $translationsKeyInCache = config('laravel_translations_in_database.translations_key_in_cache');
+            $translationsKeyInCache = config('translations.translations_key_in_cache');
             if($translationsKeyInCache AND function_exists($translationsKeyInCache)) {
                 $translationsKeyInCache = $translationsKeyInCache();
             } else {

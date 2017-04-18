@@ -1,5 +1,5 @@
 {
-    "name": "netcore/laravel-translations-in-database",
+    "name": "netcore/translations",
     "description": "Laravel translations stored in database for easy CRUD",
     "license": "MIT",
     "keywords": ["laravel", "cache", "database"],

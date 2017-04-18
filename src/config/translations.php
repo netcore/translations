@@ -61,8 +61,8 @@ return [
     'locale_iso_key_in_session' => null,
 
     // Null means that key will default to "translations". If you need something else,
-    // You can create global function get_translations_key_in_session(): String
-    // And set this to "get_translations_key_in_session" and it will be called to get the key.
+    // You can create global function get_translations_key_in_cache(): String
+    // And set this to "get_translations_key_in_cache" and it will be called to get the key.
     // Iternally we use function_exists to check this config option
     'translations_key_in_cache' => null,
 
