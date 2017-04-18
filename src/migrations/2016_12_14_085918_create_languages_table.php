@@ -36,6 +36,8 @@ class CreateLanguagesTable extends Migration
      */
     public function down()
     {
+        Schema::disableForeignKeyConstraints();
         Schema::dropIfExists('languages');
+        Schema::enableForeignKeyConstraints();
     }
 }
