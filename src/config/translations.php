@@ -54,6 +54,10 @@ return [
     // Where we put our UI
     'section'                   => 'content',
 
+    // In multi-domain pages, we might want to change this
+    'languages_primary_key'     => 'iso_code',
+    'languages_incrementing'    => false,
+
     // Null means that key will default to "locale". If you need something else,
     // You can create global function get_locale_iso_key_in_session(): String
     // And set this to "get_locale_iso_key_in_session" and it will be called to get the key.

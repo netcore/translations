@@ -43,6 +43,22 @@ class Language extends Model
     ];
 
     /**
+     * Language constructor.
+     *
+     * @param array $attributes
+     */
+    public function __construct(Array $attributes = [])
+    {
+        $languagesPrimaryKey = config('translations.languages_primary_key', 'iso_code');
+        $languagesIncrementing = config('translations.languages_incrementing', false);
+
+        $this->primaryKey = $languagesPrimaryKey;
+        $this->incrementing = $languagesIncrementing;
+        
+        parent::__construct($attributes);
+    }
+
+    /**
      * @param $value
      */
     public function setIsoCodeAttribute($value)
