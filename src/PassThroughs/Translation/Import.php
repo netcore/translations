@@ -103,7 +103,13 @@ class Import extends PassThrough
             }
         });
 
-        cache()->forget('translations');
+        $keyToForget = 'translations';
+        $function = config('translations.translations_key_in_cache');
+        if($function AND function_exists($function)) {
+            $keyToForget = $function();
+        }
+
+        cache()->forget($keyToForget);
 
         return true;
     }

@@ -111,7 +111,13 @@ class TranslationsController extends Controller
         $translation->value = (string)$value ?: null;
         $translation->save();
 
-        cache()->forget('translations');
+        $keyToForget = 'translations';
+        $function = config('translations.translations_key_in_cache');
+        if($function AND function_exists($function)) {
+            $keyToForget = $function();
+        }
+
+        cache()->forget($keyToForget);
 
         return ['status' => 'ok'];
     }
