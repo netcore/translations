@@ -22,12 +22,14 @@ class TransHelper
             $keyInSession = 'locale';
         }
 
-        $iso = session()->get($keyInSession, $defaultKeyInSession);
+        $pkValue = session()->get($keyInSession, $defaultKeyInSession);
 
-        $cached = cache()->rememberForever('language-' . $iso, function () use ($iso) {
+        $cached = cache()->rememberForever('language-' . $pkValue, function () use ($pkValue) {
+
+            $pkField= config('translations.languages_primary_key', 'iso_code');
 
             try {
-                $language = Language::whereIsoCode($iso)->first();
+                $language = Language::where($pkField, $pkValue)->first();
 
                 if ($language) {
                     return $language;
@@ -42,10 +44,10 @@ class TransHelper
 
                 // Fallback to iso itself..
                 $language = new Language();
-                $language->iso_code = $iso;
+                $language->$pkField = $pkValue;
             } catch (\Exception $e) {
                 $language = new Language();
-                $language->iso_code = $iso;
+                $language->$pkField = $pkValue;
             }
 
             return $language;
