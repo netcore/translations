@@ -25,6 +25,7 @@ class CreateLanguagesTable extends Migration
             $table->string('title_localized');
             $table->boolean('is_fallback')->default(false)->index();
 
+            $table->softDeletes();
             $table->timestamps();
         });
     }
