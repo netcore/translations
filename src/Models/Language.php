@@ -3,9 +3,12 @@
 namespace Netcore\Translator\Models;
 
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Language extends Model
 {
+    use SoftDeletes;
+
     /**
      * Override primary key
      *
