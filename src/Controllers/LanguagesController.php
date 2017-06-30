@@ -4,6 +4,7 @@ namespace Netcore\Translator\Controllers;
 
 use Illuminate\Routing\Controller;
 use Netcore\Translator\Models\Language;
+use Netcore\Translator\Models\Translation;
 use Netcore\Translator\Requests\LanguageRequest;
 
 class LanguagesController extends Controller
@@ -19,6 +20,12 @@ class LanguagesController extends Controller
      *
      * @var String
      */
+    private $viewExtends, $viewSection;
+
+    /**
+     *
+     * @var String
+     */
     private $cacheTag = 'languages';
 
     /**
@@ -27,9 +34,12 @@ class LanguagesController extends Controller
     public function __construct()
     {
         $cacheTag = config('translations.languages_cache_tag');
-        if($cacheTag AND function_exists($cacheTag)) {
+        if ($cacheTag AND function_exists($cacheTag)) {
             $this->cacheTag = $cacheTag();
         }
+        $this->viewExtends = config('translations.extends', 'layouts.admin');
+        $this->viewSection = config('translations.section', 'layouts.content');
+
     }
 
     /**
@@ -40,8 +50,10 @@ class LanguagesController extends Controller
     public function index()
     {
         $languages = Language::all();
+        $extends = $this->viewExtends;
+        $section = $this->viewSection;
 
-        return view($this->viewNamespace . '.index', compact('languages'));
+        return view($this->viewNamespace . '.index', compact('languages', 'extends', 'section'));
     }
 
     /**
@@ -51,7 +63,10 @@ class LanguagesController extends Controller
      */
     public function create()
     {
-        return view($this->viewNamespace . '.create');
+        $extends = $this->viewExtends;
+        $section = $this->viewSection;
+
+        return view($this->viewNamespace . '.create', compact('extends', 'section'));
     }
 
     /**
@@ -60,7 +75,17 @@ class LanguagesController extends Controller
      */
     public function store(LanguageRequest $request)
     {
-        Language::create($request->all());
+        $newLocale = $request->get('iso_code');
+        $language = Language::whereIsoCode($newLocale)->onlyTrashed()->first();
+
+        if ($language) {
+            $language->update($request->all());
+            $language->restore();
+        } else {
+            Language::create($request->all());
+        }
+
+        $this->copyFallbackTranslations($newLocale);
 
         // Flush cache
         cache()->tags([
@@ -78,7 +103,10 @@ class LanguagesController extends Controller
      */
     public function edit(Language $language)
     {
-        return view($this->viewNamespace . '.edit', compact('language'));
+        $extends = $this->viewExtends;
+        $section = $this->viewSection;
+
+        return view($this->viewNamespace . '.edit', compact('language', 'extends', 'section'));
     }
 
     /**
@@ -114,5 +142,36 @@ class LanguagesController extends Controller
         return response()->json([
             'state' => 'success'
         ]);
+    }
+
+    /**
+     * Copies translations from fallback language to new language
+     *
+     * @param $newLocale
+     */
+    private function copyFallbackTranslations($newLocale)
+    {
+        $fallbackLanguage = Language::whereIsFallback(1)->first();
+
+        if ($fallbackLanguage) {
+            $fallbackIsoCode = $fallbackLanguage->iso_code;
+
+            $fallbackTranslations = Translation::whereLocale($fallbackIsoCode)->get();
+
+            if ($fallbackTranslations) {
+                $copiedTranslationsWithNewLocale = $fallbackTranslations->map(function ($translation) use ($newLocale) {
+                    unset($translation->id);
+                    $translation->locale = $newLocale;
+
+                    return $translation;
+                })->toArray();
+
+                foreach ($copiedTranslationsWithNewLocale as $translation) {
+                    Translation::create($translation);
+                }
+
+                cache()->forget('translations');
+            }
+        }
     }
 }

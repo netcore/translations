@@ -1,22 +1,22 @@
-@extends('admin.layout')
+@extends($extends)
 
-@section('content')
-<div class="row">
-    <div class="col-md-18">
-        <div class="panel panel-colourable">
+@section($section)
+    <div class="row">
+        <div class="col-md-18">
+            <div class="panel panel-colourable">
 
-            <div class="panel-heading">
-                <span class="panel-title">{{ array_get($uiTranslations, 'create_language') }}</span>
-                <div class="panel-heading-controls">
-                    <a href="{{ route('admin.languages.index') }}" class="btn btn-xs btn-success">{{ array_get($uiTranslations, 'back_to_list') }}</a>
-                </div> <!-- / .panel-heading-controls -->
-            </div>
+                <div class="panel-heading">
+                    <span class="panel-title">{{ array_get($uiTranslations, 'create_language') }}</span>
+                    <div class="panel-heading-controls">
+                        <a href="{{ route('admin.languages.index') }}" class="btn btn-xs btn-success">{{ array_get($uiTranslations, 'back_to_list') }}</a>
+                    </div> <!-- / .panel-heading-controls -->
+                </div>
 
-            <div class="panel-body">
+                <div class="panel-body">
 
-                @include($viewNamespace.'::partials.messages')
+                    @include($viewNamespace.'::partials.messages')
 
-                {!! Form::open(['route' => [ 'admin.languages.store'], 'class' => 'form-horizontal']) !!}
+                    {!! Form::open(['route' => [ 'admin.languages.store'], 'class' => 'form-horizontal']) !!}
 
                     @include($viewNamespace.'::languages.form')
 
@@ -26,13 +26,13 @@
                         </div>
                     </div>
 
-                {!! Form::close()!!}
+                    {!! Form::close()!!}
 
+                </div>
             </div>
+            <!-- end panel -->
         </div>
-        <!-- end panel -->
+        <!-- end col-12 -->
     </div>
-    <!-- end col-12 -->
-</div>
-<!-- end row -->
-@stop
+    <!-- end row -->
+@endsection
