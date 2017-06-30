@@ -35,6 +35,19 @@ Add routes to RouteServiceProvider.php. Choose middleware that will allow admins
     ], function (Router $router) {
         \Netcore\Translator\Router::routes($router);
     });
+    
+Package is using cache tags. You can check out laravel documentation to find out more about cache tags .
+https://laravel.com/docs/5.4/cache#cache-tags
+
+One of the options is to use redis.
+
+First of all, install redis package by running this composer command.
+
+    composer require predis/predis
+
+Then you need to change your cache driver in .env file to redis like this
+
+    CACHE_DRIVER=redis
         
 Publish config files for defining your Admin layout to extend, translating ACP UI and more:
 
