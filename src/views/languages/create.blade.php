@@ -2,16 +2,18 @@
 
 @section($section)
     <div class="row">
-        <div class="col-md-18">
-            <div class="panel panel-colourable">
-
+        <div class="col-md-12">
+            <!-- begin panel -->
+            <div class="panel panel-inverse">
                 <div class="panel-heading">
-                    <span class="panel-title">{{ array_get($uiTranslations, 'create_language') }}</span>
-                    <div class="panel-heading-controls">
+                    <div class="panel-heading-btn">
                         <a href="{{ route('admin.languages.index') }}" class="btn btn-xs btn-success">{{ array_get($uiTranslations, 'back_to_list') }}</a>
-                    </div> <!-- / .panel-heading-controls -->
-                </div>
+                    </div>
 
+                    <h4 class="panel-title">
+                        {{ array_get($uiTranslations, 'create_language') }}
+                    </h4>
+                </div>
                 <div class="panel-body">
 
                     @include($viewNamespace.'::partials.messages')
