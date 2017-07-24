@@ -16,11 +16,9 @@ class Translator extends \Illuminate\Translation\Translator
     private static $staticCacheAllTranslations = [];
 
     /**
-     *
      * A common scenario is @each('profile', $users, 'user');
      * In this case, if we have 50 users, Blade will ask for all translations in profile.blade.php 50 times!
      * If there are 8 translations in each file, that creates 50x8=400 requests to cache!
-     *
      * And accessing cache 400 times can get noticably slow (4 seconds)
      *
      * @param array
@@ -31,9 +29,9 @@ class Translator extends \Illuminate\Translation\Translator
      * Get the translation for the given key.
      *
      * @param string $id
-     * @param array $parameters
-     * @param null $locale
-     * @param bool $fallback
+     * @param array  $parameters
+     * @param null   $locale
+     * @param bool   $fallback
      * @return array|mixed|string
      */
     public function get($id, array $parameters = [], $locale = null, $fallback = true)
@@ -65,54 +63,28 @@ class Translator extends \Illuminate\Translation\Translator
         if (!self::$staticCacheAllTranslations) {
 
             $translationsKeyInCache = config('translations.translations_key_in_cache');
-            if($translationsKeyInCache AND function_exists($translationsKeyInCache)) {
+            if ($translationsKeyInCache AND function_exists($translationsKeyInCache)) {
                 $translationsKeyInCache = $translationsKeyInCache();
             } else {
                 $translationsKeyInCache = 'translations';
             }
 
             self::$staticCacheAllTranslations = cache()->rememberForever($translationsKeyInCache, function () {
-                return Translation::all();
+                $translations = [];
+
+                foreach (Translation::all() as $translation) {
+                    array_set($translations, "{$translation->locale}.{$translation->group}.{$translation->key}",
+                        $translation->value);
+                }
+
+                return $translations;
             });
         }
 
-        $cached = self::$staticCacheAllTranslations;
-
-        $first_dot = strpos($id, '.');
-        if ($first_dot === false) {
-            return $id;
-        }
-
-        $group = substr($id, 0, $first_dot);
-        $key = substr($id, $first_dot + 1);
-
         $currentLanguage = TransHelper::getLanguage();
-        //$currentLanguage = get_language();
+        $translation = array_get(self::$staticCacheAllTranslations, "{$currentLanguage->iso_code}.{$id}", $id);
 
-        // Attributes is a special case. L5.3 expects them to be an array
-        if ($id == 'validation.attributes') {
-            $matches = $cached
-                ->where('group', 'validation')
-                ->where('locale', $currentLanguage->iso_code)
-                ->filter(function ($row) {
-                    return (strpos($row->key, 'attributes.') !== false);
-                })
-                ->each(function ($row) {
-                    $row->key = str_replace('attributes.', '', $row->key);
-                    return $row;
-                })
-                ->pluck('value', 'key');
-
-            $translation = $matches->count() ? $matches : $id;
-        } else {
-            $match = $cached
-                ->where('group', $group)
-                ->where('key', $key)
-                ->where('locale', $currentLanguage->iso_code)
-                ->first();
-
-            $translation = $match ? $match->value : $id;
-
+        if ($id != 'validation.attributes') {
             foreach ($parameters as $key => $value) {
                 $translation = str_replace(':' . $key, $value, $translation);
             }
