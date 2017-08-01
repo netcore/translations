@@ -11,6 +11,7 @@ return [
             'title_localized' => 'Title localized',
             'iso_code'        => 'ISO code',
             'fallback'        => 'Fallback',
+            'visible'         => 'Visible',
             'actions'         => 'Actions',
             'yes'             => 'Yes',
             'no'              => 'No',
@@ -19,6 +20,8 @@ return [
             'back_to_list'    => 'Back to list',
             'save'            => 'Save',
             'create_language' => 'Create language',
+            'is_visible'      => 'Is visible?',
+            'is_fallback'     => 'Is fallback?',
 
             'are_you_sure'             => 'Are you sure?',
             'language_will_be_deleted' => 'Language will be deleted',

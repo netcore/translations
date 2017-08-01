@@ -68,4 +68,13 @@ class Language extends Model
     {
         $this->attributes['iso_code'] = strtolower($value);
     }
+
+    /**
+     * @param $query
+     * @return mixed
+     */
+    public function scopeVisible($query)
+    {
+        return $query->where('is_visible', 1);
+    }
 }

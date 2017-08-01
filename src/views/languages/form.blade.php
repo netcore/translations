@@ -18,3 +18,23 @@
         {!! Form::text('title_localized', null, ['class' => 'form-control']) !!}
     </div>
 </div>
+
+<div class="form-group{{ $errors->has('is_fallback') ? ' has-error' : '' }}">
+    <label class="col-md-4 control-label">{{ array_get($uiTranslations, 'is_fallback') }}</label>
+    <div class="col-md-4">
+        {!! Form::select('is_fallback', [
+            1 => array_get($uiTranslations, 'yes'),
+            0 => array_get($uiTranslations, 'no')
+        ], null , ['class' => 'form-control']) !!}
+    </div>
+</div>
+
+<div class="form-group{{ $errors->has('is_visible') ? ' has-error' : '' }}">
+    <label class="col-md-4 control-label">{{ array_get($uiTranslations, 'is_visible') }}</label>
+    <div class="col-md-4">
+        {!! Form::select('is_visible', [
+            1 => array_get($uiTranslations, 'yes'),
+            0 => array_get($uiTranslations, 'no')
+        ], null , ['class' => 'form-control']) !!}
+    </div>
+</div>
