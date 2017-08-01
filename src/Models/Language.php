@@ -33,6 +33,7 @@ class Language extends Model
         'title_localized',
         'iso_code',
         'is_fallback',
+        'is_visible',
     ];
 
     /**
