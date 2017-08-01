@@ -6,6 +6,7 @@ use Illuminate\Routing\Controller;
 use Netcore\Translator\Models\Language;
 use Netcore\Translator\Models\Translation;
 use Netcore\Translator\Requests\LanguageRequest;
+use Netcore\Translator\Requests\UpdateLanguageRequest;
 
 class LanguagesController extends Controller
 {
@@ -110,12 +111,18 @@ class LanguagesController extends Controller
     }
 
     /**
-     * @param LanguageRequest $request
+     * @param UpdateLanguageRequest $request
      * @param Language $language
      * @return mixed
      */
-    public function update(LanguageRequest $request, Language $language)
+    public function update(UpdateLanguageRequest $request, Language $language)
     {
+        if ($request->get('is_fallback', 0)) {
+            Language::whereIsFallback(1)->update([
+                'is_fallback' => 0
+            ]);
+        }
+
         $language->update($request->all());
 
         // Flush cache
