@@ -177,7 +177,13 @@ class LanguagesController extends Controller
                     Translation::create($translation);
                 }
 
-                cache()->forget('translations');
+                $keyToForget = 'translations';
+                $function = config('translations.translations_key_in_cache');
+                if($function AND function_exists($function)) {
+                    $keyToForget = $function();
+                }
+
+                cache()->forget($keyToForget);
             }
         }
     }
