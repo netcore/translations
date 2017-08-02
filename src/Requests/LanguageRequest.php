@@ -30,10 +30,10 @@ class LanguageRequest extends FormRequest
                 'required',
                 'min:2',
                 'max:2',
-                Rule::unique('languages')->where(function ($q) {
-                    $q->where('iso_code', $this->iso_code);
-                    $q->where('deleted_at', null);
-                })
+//                Rule::unique('languages')->where(function ($q) {
+//                    $q->where('iso_code', $this->iso_code);
+//                    $q->where('deleted_at', null);
+//                })
             ],
             'title'           => 'required',
             'title_localized' => 'required'
