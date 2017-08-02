@@ -9,12 +9,13 @@
                 "columns": [
                     { "orderable": true }, // Title
                     { "orderable": true }, // Title localized
-                    { "orderable": true }, // ISO kods
+                    { "orderable": true }, // ISO code
                     { "orderable": true }, // Fallback
-                    { "orderable": false }, // Actions
+                    { "orderable": true }, // Visible
+                    { "orderable": false } // Actions
                 ],
 
-                order: [[ 0, 'desc' ]], // Default is to order by Title
+                order: [[ 0, 'desc' ]] // Default is to order by Title
             });
 
             $('#languages-index-datatable_wrapper .table-caption').text('{{ array_get($uiTranslations, 'languages') }}');

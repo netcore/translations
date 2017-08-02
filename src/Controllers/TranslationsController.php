@@ -10,6 +10,7 @@ use Netcore\Translator\Models\Language;
 
 class TranslationsController extends Controller
 {
+
     /**
      *
      * @var String
@@ -35,8 +36,20 @@ class TranslationsController extends Controller
 
         $groups = Translation::groupBy('group');
 
-        $fromLocale = input('from_locale', array_get($locales, 0, ''));
-        $toLocale = input('to_locale', array_get($locales, 1, ''));
+
+
+        if (input('from_locale', null) && input('to_locale', null)) {
+            session()->put('from_locale', input('from_locale', null));
+            session()->put('to_locale', input('to_locale', null));
+        }
+
+        $fromLocale = session()->get('from_locale', null);
+        $toLocale = session()->get('to_locale', null);
+
+        if(!$fromLocale || !$toLocale) {
+            $fromLocale = input('from_locale', array_get($locales, 0, ''));
+            $toLocale = input('to_locale', array_get($locales, 1, ''));
+        }
 
         if (!in_array($fromLocale, $locales)) {
             $fromLocale = array_get($locales, 0, '');
@@ -113,7 +126,7 @@ class TranslationsController extends Controller
 
         $keyToForget = 'translations';
         $function = config('translations.translations_key_in_cache');
-        if($function AND function_exists($function)) {
+        if ($function AND function_exists($function)) {
             $keyToForget = $function();
         }
 
