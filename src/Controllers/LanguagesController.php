@@ -93,6 +93,14 @@ class LanguagesController extends Controller
             $this->cacheTag
         ])->flush();
 
+        $keyToForget = 'translations';
+        $function = config('translations.translations_key_in_cache');
+        if($function AND function_exists($function)) {
+            $keyToForget = $function();
+        }
+
+        cache()->forget($keyToForget);
+
         return redirect()->route('admin.languages.index')->withSuccess('Successfully created!');
     }
 
@@ -176,14 +184,6 @@ class LanguagesController extends Controller
                 foreach ($copiedTranslationsWithNewLocale as $translation) {
                     Translation::create($translation);
                 }
-
-                $keyToForget = 'translations';
-                $function = config('translations.translations_key_in_cache');
-                if($function AND function_exists($function)) {
-                    $keyToForget = $function();
-                }
-
-                cache()->forget($keyToForget);
             }
         }
     }
