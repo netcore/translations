@@ -2,7 +2,7 @@
 
 return [
 
-    'ui_translations'           => [
+    'ui_translations'                 => [
 
         'languages' => [
             'languages'       => 'Languages',
@@ -51,32 +51,36 @@ return [
     ],
 
     // Which view to extend
-    'extends'                   => 'layouts.admin',
+    'extends'                         => 'layouts.admin',
 
     // Name of section in extended parent view
     // Where we put our UI
-    'section'                   => 'content',
+    'section'                         => 'content',
 
     // In multi-domain pages, we might want to change this
-    'languages_primary_key'     => 'iso_code',
-    'languages_incrementing'    => false,
+    'languages_primary_key'           => 'iso_code',
+    'languages_incrementing'          => false,
 
     // Null means that key will default to "locale". If you need something else,
     // You can create global function get_locale_iso_key_in_session(): String
     // And set this to "get_locale_iso_key_in_session" and it will be called to get the key.
     // Iternally we use function_exists to check this config option
-    'locale_iso_key_in_session' => null,
+    'locale_iso_key_in_session'       => null,
 
     // Null means that key will default to "translations". If you need something else,
     // You can create global function get_translations_key_in_cache(): String
     // And set this to "get_translations_key_in_cache" and it will be called to get the key.
     // Iternally we use function_exists to check this config option
-    'translations_key_in_cache' => null,
+    'translations_key_in_cache'       => null,
 
     // Null means that tag will default to "languages". If you need something else,
     // You can create global function get_languages_cache_tag(): String
     // And set this to "get_languages_cache_tag" and it will be called to get the key.
     // Iternally we use function_exists to check this config option
-    'languages_cache_tag'       => null,
+    'languages_cache_tag'             => null,
 
+    // False means that string translations will be  taken from fallback language
+    // But won't be copied in database. You can set this to "true" and translations will
+    // Be copied from fallback language and taken from database
+    'copy_translations_from_fallback' => true,
 ];

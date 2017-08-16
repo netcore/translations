@@ -29,9 +29,9 @@ class Translator extends \Illuminate\Translation\Translator
      * Get the translation for the given key.
      *
      * @param string $id
-     * @param array  $parameters
-     * @param null   $locale
-     * @param bool   $fallback
+     * @param array $parameters
+     * @param null $locale
+     * @param bool $fallback
      * @return array|mixed|string
      */
     public function get($id, array $parameters = [], $locale = null, $fallback = true)
@@ -82,7 +82,14 @@ class Translator extends \Illuminate\Translation\Translator
         }
 
         $currentLanguage = TransHelper::getLanguage();
-        $translation = array_get(self::$staticCacheAllTranslations, "{$currentLanguage->iso_code}.{$id}", $id);
+
+        $fallbackLanguage = TransHelper::getFallbackLanguage();
+
+        $translation = array_get(self::$staticCacheAllTranslations, "{$currentLanguage->iso_code}.{$id}", null);
+
+        if (!$translation) {
+            $translation = array_get(self::$staticCacheAllTranslations, "{$fallbackLanguage->iso_code}.{$id}", $id);
+        }
 
         if ($id != 'validation.attributes') {
             foreach ($parameters as $key => $value) {

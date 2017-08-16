@@ -23,8 +23,8 @@
     <label class="col-md-4 control-label">{{ array_get($uiTranslations, 'is_fallback') }}</label>
     <div class="col-md-4">
         {!! Form::select('is_fallback', [
-            1 => array_get($uiTranslations, 'yes'),
-            0 => array_get($uiTranslations, 'no')
+            0 => array_get($uiTranslations, 'no'),
+            1 => array_get($uiTranslations, 'yes')
         ], null , ['class' => 'form-control']) !!}
     </div>
 </div>

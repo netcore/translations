@@ -16,7 +16,7 @@ class TransHelper
         $defaultKeyInSession = config('app.locale');
 
         $keyInSession = config('translations.locale_iso_key_in_session', 'locale');
-        if($keyInSession AND function_exists($keyInSession)) {
+        if ($keyInSession AND function_exists($keyInSession)) {
             $keyInSession = $keyInSession();
         } else {
             $keyInSession = 'locale';
@@ -26,7 +26,7 @@ class TransHelper
 
         $cached = cache()->rememberForever('language-' . $pkValue, function () use ($pkValue) {
 
-            $pkField= config('translations.languages_primary_key', 'iso_code');
+            $pkField = config('translations.languages_primary_key', 'iso_code');
 
             try {
                 $language = Language::where($pkField, $pkValue)->first();
@@ -49,6 +49,28 @@ class TransHelper
                 $language = new Language();
                 $language->$pkField = $pkValue;
             }
+
+            return $language;
+        });
+
+        return $cached;
+    }
+
+    /**
+     * @return mixed
+     */
+    public static function getFallbackLanguage()
+    {
+        $cached = cache()->rememberForever('fallback-language', function () {
+
+            $language = Language::where('is_fallback', 1)->first();
+
+            if ($language) {
+                return $language;
+            }
+
+            // Fallback to first..
+            $language = Language::first();
 
             return $language;
         });

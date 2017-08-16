@@ -86,7 +86,9 @@ class LanguagesController extends Controller
             Language::create($request->all());
         }
 
-        $this->copyFallbackTranslations($newLocale);
+        if (config('translations.copy_translations_from_fallback', false)) {
+            $this->copyFallbackTranslations($newLocale);
+        }
 
         // Flush cache
         cache()->tags([
@@ -95,7 +97,7 @@ class LanguagesController extends Controller
 
         $keyToForget = 'translations';
         $function = config('translations.translations_key_in_cache');
-        if($function AND function_exists($function)) {
+        if ($function AND function_exists($function)) {
             $keyToForget = $function();
         }
 
