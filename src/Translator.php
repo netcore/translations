@@ -101,4 +101,19 @@ class Translator extends \Illuminate\Translation\Translator
 
         return $translation;
     }
+
+    /**
+     * Get the translation for a given key from the JSON translation files.
+     *
+     * @param  string  $id
+     * @param  array  $parameters
+     * @param  string  $locale
+     * @return string
+     */
+    public function getFromJson($id, array $parameters = [], $locale = null)
+    {
+        $locale = $locale ?: $this->locale;
+
+        return $this->get($id, $parameters, $locale);
+    }
 }
