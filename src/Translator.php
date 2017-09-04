@@ -32,9 +32,9 @@ class Translator extends \Illuminate\Translation\Translator
      * @param array $parameters
      * @param null $locale
      * @param bool $fallback
-     * @return array|mixed|string
+     * @return String
      */
-    public function get($id, array $parameters = [], $locale = null, $fallback = true)
+    public function get($id, array $parameters = [], $locale = null, $fallback = true): String
     {
         /*
          * Overwrite way how trans('group.key') helper and @lang directive work
@@ -73,8 +73,14 @@ class Translator extends \Illuminate\Translation\Translator
                 $translations = [];
 
                 foreach (Translation::all() as $translation) {
-                    array_set($translations, "{$translation->locale}.{$translation->group}.{$translation->key}",
-                        $translation->value);
+                    
+                    // We want only Strings to be returned by this method. No arrays.
+                    
+                    //array_set($translations, "{$translation->locale}.{$translation->group}.{$translation->key}",
+                        //$translation->value);
+
+                    $key = "{$translation->locale}.{$translation->group}.{$translation->key}";
+                    $translations[$key] = $translation->value;
                 }
 
                 return $translations;
