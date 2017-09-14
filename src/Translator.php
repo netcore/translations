@@ -91,7 +91,7 @@ class Translator extends \Illuminate\Translation\Translator
 
         $fallbackLanguage = TransHelper::getFallbackLanguage();
 
-        $translation = array_get(self::$staticCacheAllTranslations, "{$currentLanguage->iso_code}.{$id}", null);
+        $translation = array_get(self::$staticCacheAllTranslations, "{$currentLanguage->iso_code}.{$id}", $id);
 
         if (!$translation) {
             $translation = array_get(self::$staticCacheAllTranslations, "{$fallbackLanguage->iso_code}.{$id}", $id);
@@ -105,7 +105,7 @@ class Translator extends \Illuminate\Translation\Translator
 
         self::$staticCacheFrequentTranslations[$staticCacheKey] = $translation;
 
-        return $translation;
+        return (string) $translation;
     }
 
     /**
