@@ -75,8 +75,9 @@
 
         var dataTable = $('#trans-in-db-table').DataTable({
             ordering:false,
-            pageLength:500,
-            sDom:'tpi'
+            pageLength: 5000,
+            lengthMenu: [ 5000 ],
+            sDom:'t'
         });
 
         $(".resource-search").on("keyup search input paste cut", function() {
