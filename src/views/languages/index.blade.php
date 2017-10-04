@@ -54,6 +54,7 @@
 
                                     @include($viewNamespace . '::partials.destroy_button', [
                                         'route'         => 'admin.languages.destroy',
+                                        'data_id'       => $language->iso_code,
                                         'row'           => $language,
                                         'title'         => array_get($uiTranslations, 'are_you_sure'),
                                         'text'          => array_get($uiTranslations, 'language_will_be_deleted'),
