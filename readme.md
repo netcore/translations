@@ -71,7 +71,7 @@ After that, point this .env variable to your live server:
 
     NETCORE_TRANSLATIONS_DOWNLOAD_FROM=https://project.eu/api/translations/index
 
-And then run ```php artisan translations::download``` on your development or local machine.
+And then run ```php artisan translations:download``` on your development or local machine.
 
 ## Is it battle tested?
 
