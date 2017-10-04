@@ -24,22 +24,24 @@
             </form>
         </th>
 
-        <th width="40%">
-            <form action="" class="col-xs-12 locale_switching_form trans-in-db-inline trans-in-db-zero-padding">
+        @if(count($locales) > 1)
+            <th width="40%">
+                <form action="" class="col-xs-12 locale_switching_form trans-in-db-inline trans-in-db-zero-padding">
 
-                <div class="input-group trans-in-db-zero-margin trans-in-db-full-width">
-                    <select name="to_locale" class="form-control no-padding-hr">
-                        @foreach( $locales as $locale )
-                            <option value="{{ $locale }}" {!! $locale==$toLocale ? 'selected="selected"' : '' !!}>
-                                {{ strtoupper($locale) }}
-                            </option>
-                        @endforeach
-                    </select>
-                </div>
+                    <div class="input-group trans-in-db-zero-margin trans-in-db-full-width">
+                        <select name="to_locale" class="form-control no-padding-hr">
+                            @foreach( $locales as $locale )
+                                <option value="{{ $locale }}" {!! $locale==$toLocale ? 'selected="selected"' : '' !!}>
+                                    {{ strtoupper($locale) }}
+                                </option>
+                            @endforeach
+                        </select>
+                    </div>
 
-                <input name="from_locale" type="hidden" value="{{ $fromLocale }}">
-            </form>
-        </th>
+                    <input name="from_locale" type="hidden" value="{{ $fromLocale }}">
+                </form>
+            </th>
+        @endif
     </tr>
     </thead>
     <tbody>
@@ -73,8 +75,11 @@
 
                 <td class="spacetd">
                 </td>
-                <td class="spacetd">
-                </td>
+
+                @if(count($locales) > 1)
+                    <td class="spacetd">
+                    </td>
+                @endif
             </tr>
             <?php $previous_group = $translation->group; ?>
         @endif
@@ -85,7 +90,14 @@
                 {{ $translation->key }}
             </td>
 
-            @foreach( [ $fromLocale, $toLocale ] as $locale )
+            @php
+                $tds = [$fromLocale, $toLocale];
+                if($fromLocale == $toLocale) {
+                    $tds = [$fromLocale];
+                }
+            @endphp
+
+            @foreach( $tds as $locale )
 
                 <?php
                     $t = object_get($translation, $locale, null);
