@@ -31,7 +31,7 @@ class Translation extends Model
      */
     public function import()
     {
-        return new Import($this);
+        return new Import();
     }
 
     /**
@@ -39,6 +39,6 @@ class Translation extends Model
      */
     public function export()
     {
-        return new Export($this);
+        return new Export();
     }
 }

@@ -43,22 +43,43 @@
 
                         <div class="col-md-10">
 
+                            @php
+                                $success = session()->get('translations-success', []);
+                            @endphp
+                            @if($success)
+                                <div class="row">
+                                    <div class="col-md-12">
+                                        <div class="alert alert-success">
+                                            @if(is_array($success))
+                                                @foreach($success as $successMessage)
+                                                    {{ $successMessage }}
+                                                    <br>
+                                                @endforeach
+                                            @else
+                                                {{ $success }}
+                                            @endif
+                                        </div>
+                                    </div>
+                                </div>
+                            @endif
+
                             <div class="row">
                                 <div class="col-md-6">
+
                                     <form action="" class="col-xs-12 trans-in-db-inline trans-in-db-zero-padding"">
-                                    <div class="input-group trans-in-db-zero-margin">
+                                        <div class="input-group trans-in-db-zero-margin">
 
-                                                <span class="input-group-addon" id="trans-in-db-search-span">
-                                                    <i class="fa fa-search"></i>
-                                                </span>
+                                            <span class="input-group-addon" id="trans-in-db-search-span">
+                                                <i class="fa fa-search"></i>
+                                            </span>
 
-                                        <input
+                                            <input
                                                 type="text"
                                                 placeholder="{{ array_get($uiTranslations, 'search') }}"
                                                 class="form-control no-padding-hr resource-search"
                                                 id="trans-in-db-search-input"
-                                        >
-                                    </div>
+                                            >
+                                        </div>
                                     </form>
                                 </div>
                                 <div class="col-md-6 trans-in-db-text-align-right">

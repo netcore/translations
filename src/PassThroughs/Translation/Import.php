@@ -9,17 +9,13 @@ use Netcore\Translator\Models\Language;
 class Import extends PassThrough
 {
 
-    private $translation;
-
     /**
-     * Import constructor.
      *
-     * @param Translation $translation
+     * Counter to give feedback to user
+     *
+     * @var int
      */
-    public function __construct(Translation $translation)
-    {
-        $this->translation = $translation;
-    }
+    private $existingKeysCount = 0;
 
     /**
      *
@@ -28,90 +24,84 @@ class Import extends PassThrough
      * 3. Delete from DB those keys that already exist there
      * 4. Mass-insert all entries that are in excel
      *
-     * @param array $all_data
+     * 1. Parse excel file and create a collection of all entries in that file
+     * 2. Determine which keys do not exist in DB via some collection magic (dont fire endless queries)
+     * 3. Mass-insert all new keys
+     * 4. Show confirmation message with the following stats:
+     *    1) x new keys were found. These were added.
+     *    2) x keys already exist. These were not changed.
+     *
+     * @param array $allData
      * @return bool
      */
-    public function process($all_data)
+    public function process($allData)
     {
-        \DB::transaction(function () use ($all_data) {
-            $locales = Language::pluck('iso_code')->toArray();
+        \DB::transaction(function () use ($allData) {
 
             // 1.
-
-            $translations = collect();
-
-            foreach ($all_data as $page_nr => $page_data) {
-
-                // If this is not empty, it means we only have one sheet.
-                // Otherwise, we have multiple sheets.
-                $group_key = array_get($page_data, 'key', '');
-
-                if ($group_key) {
-                    foreach ($all_data as $row) {
-                        $new_items = $this->translationsFromOneRow($row, $locales);
-                        foreach ($new_items as $item) {
-                            $translations->push($item);
-                        }
-                    }
-                    break;
-                } else {
-                    foreach ($page_data as $row) {
-                        $new_items = $this->translationsFromOneRow($row, $locales);
-                        foreach ($new_items as $item) {
-                            $translations->push($item);
-                        }
-                    }
-                }
-            }
+            $parsedTranslations = $this->parsedTranslations($allData);
 
             // 2.
-
-            $existing = collect(Translation::get());
-            $delete_ids = [];
-
-            foreach ($translations as $translation) {
-
-                $existsQuery = $existing
-                    ->where('locale', $translation['locale'])
-                    ->where('group', $translation['group'])
-                    ->where('key', $translation['key']);
-
-                if( is_callable('domain_id') ) {
-                    $existsQuery = $existsQuery
-                        ->where('domain_id', domain_id());
-                }
-
-                $exists = $existsQuery->first();
-
-                if ($exists) {
-                    $delete_ids[] = $exists->id;
-                }
-            }
+            $newTranslations = $this->newTranslations($parsedTranslations);
 
             // 3.
-
-            foreach (array_chunk($delete_ids, 300) as $chunk) {
-                info('Deleting chunk. Elements count - ' . count($chunk));
-                Translation::whereIn('id', $chunk)->delete();
+            foreach (array_chunk($newTranslations, 300) as $chunk) {
+                Translation::insert($chunk);
             }
 
             // 4.
-
-            foreach (array_chunk($translations->toArray(), 300) as $chunk) {
-                info('Inserting chunk. Elements count - ' . count($chunk));
-                Translation::insert($chunk);
-            }
+            $localesCount = Language::pluck('iso_code')->count();
+            $newKeysCount = round(count($newTranslations) / $localesCount);
+            $existingKeysCount = round($this->existingKeysCount / $localesCount);
+            $this->flashMessages($newKeysCount, $existingKeysCount);
         });
 
         $keyToForget = 'translations';
         $function = config('translations.translations_key_in_cache');
-        if($function AND function_exists($function)) {
+        if ($function AND function_exists($function)) {
             $keyToForget = $function();
         }
 
         cache()->forget($keyToForget);
 
         return true;
+    }
+
+    /**
+     * @param $allData
+     * @return \Illuminate\Support\Collection
+     */
+    private function parsedTranslations($allData)
+    {
+        $locales = Language::pluck('iso_code')->toArray();
+
+        $parsedTranslations = [];
+
+        foreach ($allData as $pageNr => $pageData) {
+
+            // If this is not empty, it means we only have one sheet.
+            // Otherwise, we have multiple sheets.
+            $groupKey = array_get($pageData, 'key', '');
+
+            if ($groupKey) {
+                foreach ($allData as $row) {
+                    $newItems = $this->translationsFromOneRow($row, $locales);
+                    foreach ($newItems as $item) {
+                        $parsedTranslations[] = $item;
+                    }
+                }
+                break;
+            } else {
+                foreach ($pageData as $row) {
+                    $newItems = $this->translationsFromOneRow($row, $locales);
+                    foreach ($newItems as $item) {
+                        $parsedTranslations[] = $item;
+                    }
+                }
+            }
+        }
+
+        return $parsedTranslations;
     }
 
     /**
@@ -123,23 +113,23 @@ class Import extends PassThrough
     {
         $translations = collect();
 
-        $group_key = array_get($row, 'key', '');
+        $groupKey = array_get($row, 'key', '');
 
-        if (!$group_key) {
+        if (!$groupKey) {
             return $translations;
         }
 
-        $first_dot = strpos($group_key, '.');
-        if ($first_dot === false) {
+        $firstDot = strpos($groupKey, '.');
+        if ($firstDot === false) {
             return $translations;
         }
 
-        $group = substr($group_key, 0, $first_dot);
-        $key = substr($group_key, $first_dot + 1);
+        $group = substr($groupKey, 0, $firstDot);
+        $key = substr($groupKey, $firstDot + 1);
 
         foreach ($row as $fieldname => $value) {
             if ($fieldname AND in_array($fieldname, $locales)) {
-                
+
                 $data = ([
                     'locale' => $fieldname,
                     'group'  => $group,
@@ -147,14 +137,96 @@ class Import extends PassThrough
                     'value'  => array_get($row, $fieldname, ''),
                 ]);
 
-                if( is_callable('domain_id') ) {
+                if (function_exists('domain_id')) {
                     $data['domain_id'] = domain_id();
                 }
-                
+
                 $translations->push($data);
             }
         }
 
         return $translations;
+    }
+
+    /**
+     * @param $parsedTranslations
+     * @return array
+     */
+    private function newTranslations($parsedTranslations)
+    {
+        $fieldsToSelect = [
+            'locale',
+            'group',
+            'key'
+        ];
+
+        $callableDomainId = is_callable('domain_id');
+
+        if ($callableDomainId) {
+            $fieldsToSelect[] = 'domain_id';
+        }
+
+        $existing = Translation::select($fieldsToSelect)->get();
+        $newTranslations = [];
+
+        foreach ($parsedTranslations as $parsedTranslation) {
+
+            $existsQuery = $existing
+                ->where('locale', $parsedTranslation['locale'])
+                ->where('group', $parsedTranslation['group'])
+                ->where('key', $parsedTranslation['key']);
+
+            if ($callableDomainId) {
+                $existsQuery = $existsQuery
+                    ->where('domain_id', domain_id());
+            }
+
+            $exists = $existsQuery->first();
+
+            if ($exists == false) {
+                $newTranslations[] = $parsedTranslation;
+            } else {
+                $this->existingKeysCount++;
+            }
+        }
+
+        return $newTranslations;
+    }
+
+    /**
+     * @param $newKeysCount
+     * @param $existingKeysCount
+     */
+    private function flashMessages($newKeysCount, $existingKeysCount)
+    {
+        $response = [];
+        $uiTranslations = config('translations.ui_translations', []);
+        
+        if($newKeysCount) {
+            $xNewKeysWereFound = array_get(
+                $uiTranslations,
+                'x-new-keys-were-found',
+                ':count new keys added to system!'
+            );
+            $response[] = str_replace(':count', $newKeysCount, $xNewKeysWereFound);
+        } else {
+            $noNewKeysWereFound = array_get(
+                $uiTranslations,
+                'new-keys-were-not-found',
+                'No new keys to add! Doing nothing.'
+            );
+            $response[] = $noNewKeysWereFound;
+        }
+
+        if($existingKeysCount) {
+            $xKeysAlreadyExist = array_get(
+                $uiTranslations,
+                'x-keys-already-exist',
+                ':count keys already exist. These were not changed.'
+            );
+            $response[] = str_replace(':count', $existingKeysCount, $xKeysAlreadyExist);
+        }
+
+        session()->flash('translations-success', $response);
     }
 }

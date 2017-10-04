@@ -9,18 +9,6 @@ use Netcore\Translator\PassThroughs\PassThrough;
 class Export extends PassThrough
 {
 
-    private $translation;
-
-    /**
-     * Export constructor.
-     *
-     * @param Translation $translation
-     */
-    public function __construct(Translation $translation)
-    {
-        $this->translation = $translation;
-    }
-
     /**
      * @return mixed
      */
