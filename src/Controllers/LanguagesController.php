@@ -150,7 +150,7 @@ class LanguagesController extends Controller
     public function destroy(Language $language)
     {
         $language->delete(); // Soft delete
-
+        
         // Flush cache
         cache()->tags([
             $this->cacheTag
@@ -168,25 +168,46 @@ class LanguagesController extends Controller
      */
     private function copyFallbackTranslations($newLocale)
     {
-        $fallbackLanguage = Language::whereIsFallback(1)->first();
+        \DB::transaction(function () use ($newLocale) {
 
-        if ($fallbackLanguage) {
-            $fallbackIsoCode = $fallbackLanguage->iso_code;
+            $existingTranslations = Translation::get();
+            $fallbackLanguage = Language::whereIsFallback(1)->first();
 
-            $fallbackTranslations = Translation::whereLocale($fallbackIsoCode)->get();
+            if ($fallbackLanguage) {
+                $fallbackIsoCode = $fallbackLanguage->iso_code;
 
-            if ($fallbackTranslations) {
-                $copiedTranslationsWithNewLocale = $fallbackTranslations->map(function ($translation) use ($newLocale) {
-                    unset($translation->id);
-                    $translation->locale = $newLocale;
+                $fallbackTranslations = Translation::whereLocale($fallbackIsoCode)->get();
 
-                    return $translation;
-                })->toArray();
+                if ($fallbackTranslations) {
+                    $copiedTranslationsWithNewLocale = $fallbackTranslations->map(function ($translation) use ($newLocale) {
+                        unset($translation->id);
+                        $translation->locale = mb_strtolower($newLocale);
 
-                foreach ($copiedTranslationsWithNewLocale as $translation) {
-                    Translation::create($translation);
+                        return $translation;
+                    })->toArray();
+                    
+                    $translationsToCreate = [];
+
+                    foreach ($copiedTranslationsWithNewLocale as $translation) {
+
+                        // Safety feature - dont create entry if it already exists
+                        // This might happen if administrator creates new language, deletes it, and then creates again
+                        $exists = $existingTranslations
+                            ->where('group', $translation['group'])
+                            ->where('key', $translation['key'])
+                            ->where('locale', $translation['locale'])
+                            ->first();
+                        
+                        if(!$exists) {
+                            $translationsToCreate[] = $translation;
+                        }
+                    }
+
+                    foreach (array_chunk($translationsToCreate, 300) as $chunk) {
+                        Translation::insert($chunk);
+                    }
                 }
             }
-        }
+        });
     }
 }
