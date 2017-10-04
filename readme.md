@@ -33,10 +33,10 @@ Add routes to RouteServiceProvider.php. Choose middleware that will allow admins
         'prefix'     => 'admin',
         'as'         => 'admin.'
     ], function (Router $router) {
-        \Netcore\Translator\Router::routes($router);
+        \Netcore\Translator\Router::adminRoutes($router);
     });
     
-Package is using cache tags. You can check out laravel documentation to find out more about cache tags .
+Package uses cache tags. You can check out laravel documentation to find out more about cache tags .
 https://laravel.com/docs/5.4/cache#cache-tags
 
 One of the options is to use redis.
@@ -52,6 +52,26 @@ Then you need to change your cache driver in .env file to redis like this
 Publish config files for defining your Admin layout to extend, translating ACP UI and more:
 
     php artisan vendor:publish --tag=config
+    
+## How to download translations from live server to development
+
+We often want to get exact copy of translations from live server to either development or our local server.
+In order to do that, we must expose API routes in RouteServiceProvider.php:
+
+    Route::group([
+        'middleware' => ['api'],
+        'namespace'  => null,
+        'prefix'     => 'api',
+        'as'         => 'api.'
+    ], function ($router) {
+        Router::apiRoutes($router);
+    });
+    
+After that, point this .env variable to your live server:
+
+    NETCORE_TRANSLATIONS_DOWNLOAD_FROM=https://project.eu/api/translations/index
+
+And then run ```php artisan translations::download``` on your development or local machine.
 
 ## Is it battle tested?
 
