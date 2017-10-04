@@ -2,6 +2,7 @@
 
 use Illuminate\Contracts\View\View;
 use Illuminate\Translation\TranslationServiceProvider;
+use Netcore\Translator\Commands\DownloadTranslations;
 use Netcore\Translator\Helpers\TransHelper;
 
 class ServiceProvider extends TranslationServiceProvider
@@ -74,5 +75,10 @@ class ServiceProvider extends TranslationServiceProvider
             $uiTranslations = config('translations.ui_translations.partials', []);
             $view->with(compact('uiTranslations'));
         });
+
+        // Commands
+        $this->commands([
+            DownloadTranslations::class
+        ]);
     }
 }

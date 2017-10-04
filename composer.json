@@ -16,7 +16,9 @@
         "illuminate/database": "^5.3",
         "illuminate/cache": "^5.3",
         "illuminate/routing": "^5.3",
-        "illuminate/support": "^5.3"
+        "illuminate/support": "^5.3",
+        "illuminate/console": "^5.3",
+        "rmccue/requests": "^1.7"
     },
     "autoload": {
         "psr-4": {

@@ -1,6 +1,22 @@
 <?php
 
 return [
+    
+    'api' => [
+        
+        /**
+         * 
+         * You can expose API that returns all translations.
+         * Normally translations can be public, but if you want this API to
+         * be protected by a secret password, then you can set it here.
+         * 
+         * NULL means that there is no password and API is public.
+         * 
+         */
+        'secret' => env('NETCORE_TRANSLATIONS_SECRET'),
+        
+        'download_from' => env('NETCORE_TRANSLATIONS_DOWNLOAD_FROM')
+    ],
 
     'ui_translations'                 => [
 

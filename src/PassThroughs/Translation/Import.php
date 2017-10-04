@@ -56,13 +56,20 @@ class Import extends PassThrough
             $this->flashMessages($newKeysCount, $existingKeysCount);
         });
 
-        $keyToForget = 'translations';
-        $function = config('translations.translations_key_in_cache');
-        if ($function AND function_exists($function)) {
-            $keyToForget = $function();
-        }
+        $this->flushCache();
 
-        cache()->forget($keyToForget);
+        return true;
+    }
+
+    /**
+     * @param $json
+     * @return bool
+     * @throws \Exception
+     */
+    public function processJson($json)
+    {
+
+        $this->flushCache();
 
         return true;
     }
@@ -229,4 +236,19 @@ class Import extends PassThrough
 
         session()->flash('success', $response);
     }
+    
+    /**
+     *
+     */
+    public function flushCache()
+    {
+        $keyToForget = 'translations';
+        $function = config('translations.translations_key_in_cache');
+        if ($function AND function_exists($function)) {
+            $keyToForget = $function();
+        }
+
+        cache()->forget($keyToForget);
+    }
+
 }
