@@ -116,13 +116,18 @@ class TranslationsController extends Controller
 
         list($locale, $key) = explode('|', $name, 2);
 
-        $translation = Translation::firstOrNew([
+        Translation::where([
+            'locale' => $locale,
+            'group'  => $group,
+            'key'    => $key
+        ])->delete();
+
+        $translation = Translation::forceCreate([
             'locale' => $locale,
             'group'  => $group,
             'key'    => $key,
+            'value'  => $value
         ]);
-        $translation->value = (string)$value ?: null;
-        $translation->save();
 
         $keyToForget = 'translations';
         $function = config('translations.translations_key_in_cache');
