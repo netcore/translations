@@ -20,8 +20,6 @@
                 </div>
                 <div class="panel-body">
 
-                    @include($viewNamespace.'::partials.messages')
-
                     <div class="row">
                         <div class="col-md-2">
 
@@ -44,7 +42,7 @@
                         <div class="col-md-10">
 
                             @php
-                                $success = session()->get('translations-success', []);
+                                $success = session()->get('success', []);
                             @endphp
                             @if($success)
                                 <div class="row">

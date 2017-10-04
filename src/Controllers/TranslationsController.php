@@ -155,8 +155,8 @@ class TranslationsController extends Controller
                 ->toArray();
         } catch (\Exception $e) {
 
-            $uiTranslations = config('translations.ui_translations', []);
-            $error = array_get($uiTranslations, 'couldnt-import-excel');
+            $uiTranslations = config('translations.ui_translations.translations', []);
+            $error = array_get($uiTranslations, 'couldnt_import_excel');
 
             return redirect()->back()->withError($error);
         }
@@ -164,10 +164,7 @@ class TranslationsController extends Controller
         $translation = new Translation();
         $translation->import()->process($all_data);
 
-        $uiTranslations = config('translations.ui_translations', []);
-        $msg = array_get($uiTranslations, 'translations-have-been-imported');
-
-        return redirect()->back()->withSuccess($msg);
+        return redirect()->back();
     }
 
     /**
@@ -208,10 +205,10 @@ class TranslationsController extends Controller
             );
         }
         
-        $uiTranslations = config('translations.ui_translations', []);
+        $uiTranslations = config('translations.ui_translations.translations', []);
         $msg = array_get(
             $uiTranslations,
-            'translation-has-been-added',
+            'translation_has_been_added',
             'Translation has been added!'
         );
 

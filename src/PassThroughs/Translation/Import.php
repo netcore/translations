@@ -200,19 +200,19 @@ class Import extends PassThrough
     private function flashMessages($newKeysCount, $existingKeysCount)
     {
         $response = [];
-        $uiTranslations = config('translations.ui_translations', []);
+        $uiTranslations = config('translations.ui_translations.translations', []);
         
         if($newKeysCount) {
             $xNewKeysWereFound = array_get(
                 $uiTranslations,
-                'x-new-keys-were-found',
+                'x_new_keys_were_found',
                 ':count new keys added to system!'
             );
             $response[] = str_replace(':count', $newKeysCount, $xNewKeysWereFound);
         } else {
             $noNewKeysWereFound = array_get(
                 $uiTranslations,
-                'new-keys-were-not-found',
+                'new_keys_were_not_found',
                 'No new keys to add! Doing nothing.'
             );
             $response[] = $noNewKeysWereFound;
@@ -221,12 +221,12 @@ class Import extends PassThrough
         if($existingKeysCount) {
             $xKeysAlreadyExist = array_get(
                 $uiTranslations,
-                'x-keys-already-exist',
+                'x_keys_already_exist',
                 ':count keys already exist. These were not changed.'
             );
             $response[] = str_replace(':count', $existingKeysCount, $xKeysAlreadyExist);
         }
 
-        session()->flash('translations-success', $response);
+        session()->flash('success', $response);
     }
 }
