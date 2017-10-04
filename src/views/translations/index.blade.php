@@ -96,6 +96,10 @@
                                                 class="btn btn-xs btn-info trans-in-db-inline-block"
                                         >
                                     </form>
+
+                                    <a href="{{ route('admin.translations.manual') }}" id="manual-options">
+                                        {{ array_get($uiTranslations, 'add_manually', 'Add manually') }}
+                                    </a>
                                 </div>
                             </div>
 

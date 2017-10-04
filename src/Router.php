@@ -30,6 +30,16 @@ class Router
                 'as'   => 'translations.edit',
                 'uses' => TranslationsController::class . '@edit'
             ]);
+            
+            $router->get('/manual', [
+                'as'   => 'translations.manual',
+                'uses' => TranslationsController::class . '@manual'
+            ]);
+
+            $router->post('/store', [
+                'as'   => 'translations.store',
+                'uses' => TranslationsController::class . '@storeTranslation'
+            ]);
 
             $router->get('/{group?}', [
                 'as'   => 'translations.index',

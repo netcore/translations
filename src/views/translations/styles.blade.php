@@ -51,4 +51,10 @@
         width:100%;
     }
 
+    #manual-options{
+        position:relative;
+        top: 13px;
+        right:0px;
+    }
+
 </style>

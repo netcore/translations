@@ -7,6 +7,7 @@ use Illuminate\Routing\Controller;
 use Netcore\Translator\Models\Translation;
 use Netcore\Translator\Requests\ImportTranslationsRequest;
 use Netcore\Translator\Models\Language;
+use Netcore\Translator\Requests\StoreTranslationRequest;
 
 class TranslationsController extends Controller
 {
@@ -37,7 +38,6 @@ class TranslationsController extends Controller
         $groups = Translation::groupBy('group');
 
 
-
         if (input('from_locale', null) && input('to_locale', null)) {
             session()->put('from_locale', input('from_locale', null));
             session()->put('to_locale', input('to_locale', null));
@@ -46,7 +46,7 @@ class TranslationsController extends Controller
         $fromLocale = session()->get('from_locale', null);
         $toLocale = session()->get('to_locale', null);
 
-        if(!$fromLocale || !$toLocale) {
+        if (!$fromLocale || !$toLocale) {
             $fromLocale = input('from_locale', array_get($locales, 0, ''));
             $toLocale = input('to_locale', array_get($locales, 1, ''));
         }
@@ -180,4 +180,41 @@ class TranslationsController extends Controller
         $excel->download('xlsx');
     }
 
+    /**
+     * @return mixed
+     */
+    public function manual()
+    {
+        $extends = config('translations.extends', 'layouts.admin');
+        $section = config('translations.section', 'layouts.content');
+        return view($this->viewNamespace . '.manual', compact('extends', 'section'));
+    }
+
+    /**
+     * @param StoreTranslationRequest $request
+     * @return mixed
+     */
+    public function storeTranslation(StoreTranslationRequest $request)
+    {
+        $group = $request->get('group');
+        $key = trim($request->get('key'));
+
+        $locales = Language::pluck('iso_code')->toArray();
+        
+        foreach($locales as $locale) {
+            $value = '';
+            Translation::forceCreate(
+                compact('group', 'key', 'locale', 'value')
+            );
+        }
+        
+        $uiTranslations = config('translations.ui_translations', []);
+        $msg = array_get(
+            $uiTranslations,
+            'translation-has-been-added',
+            'Translation has been added!'
+        );
+
+        return redirect()->route('admin.translations.index')->withSuccess($msg);
+    }
 }
