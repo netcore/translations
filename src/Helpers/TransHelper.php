@@ -3,6 +3,7 @@
 namespace Netcore\Translator\Helpers;
 
 use Netcore\Translator\Models\Language;
+use Illuminate\Support\Facades\Schema;
 
 class TransHelper
 {
@@ -76,5 +77,28 @@ class TransHelper
         });
 
         return $cached;
+    }
+
+    /**
+     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
+     */
+    public static function getAllLanguages()
+    {
+        $languages = [];
+        if (Schema::hasTable('languages')) {
+            $languages = \Netcore\Translator\Models\Language::all();
+        }
+
+        if(!$languages) {
+            $languages = [
+                new \Netcore\Translator\Models\Language([
+                    'iso_code'        => config('app.locale'),
+                    'title'           => strtoupper(config('app.locale')),
+                    'title_localized' => strtoupper(config('app.locale'))
+                ])
+            ];
+        }
+
+        return $languages;
     }
 }
