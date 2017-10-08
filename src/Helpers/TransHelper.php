@@ -86,7 +86,7 @@ class TransHelper
     {
         $languages = [];
         if (Schema::hasTable('languages')) {
-            $languages = \Netcore\Translator\Models\Language::all();
+            $languages = \Netcore\Translator\Models\Language::all()->toArray();
         }
 
         if(!$languages) {
