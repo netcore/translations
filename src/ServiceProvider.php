@@ -80,5 +80,8 @@ class ServiceProvider extends TranslationServiceProvider
         $this->commands([
             DownloadTranslations::class
         ]);
+        
+        // Global helpers
+        require_once app_path('Helpers/Global.php');
     }
 }
