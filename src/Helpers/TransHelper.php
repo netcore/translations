@@ -90,7 +90,7 @@ class TransHelper
             $languages = \Netcore\Translator\Models\Language::all();
         }
 
-        if(!$languages) {
+        if(!$languages->count()) {
             $languages = collect([
                 new \Netcore\Translator\Models\Language([
                     'iso_code'        => config('app.locale'),
