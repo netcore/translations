@@ -2,6 +2,7 @@
 
 namespace Netcore\Translator\Helpers;
 
+use Illuminate\Support\Collection;
 use Netcore\Translator\Models\Language;
 use Illuminate\Support\Facades\Schema;
 
@@ -80,23 +81,23 @@ class TransHelper
     }
 
     /**
-     * @return array|\Illuminate\Database\Eloquent\Collection|static[]
+     * @return Collection
      */
-    public static function getAllLanguages()
+    public static function getAllLanguages(): Collection
     {
-        $languages = [];
+        $languages = collect();
         if (Schema::hasTable('languages')) {
-            $languages = \Netcore\Translator\Models\Language::all()->toArray();
+            $languages = \Netcore\Translator\Models\Language::all();
         }
 
         if(!$languages) {
-            $languages = [
+            $languages = collect([
                 new \Netcore\Translator\Models\Language([
                     'iso_code'        => config('app.locale'),
                     'title'           => strtoupper(config('app.locale')),
                     'title_localized' => strtoupper(config('app.locale'))
                 ])
-            ];
+            ]);
         }
 
         return $languages;
