@@ -90,10 +90,7 @@ class LanguagesController extends Controller
             $this->copyFallbackTranslations($newLocale);
         }
 
-        // Flush cache
-        cache()->tags([
-            $this->cacheTag
-        ])->flush();
+        $this->clearCache();
 
         $keyToForget = 'translations';
         $function = config('translations.translations_key_in_cache');
@@ -135,10 +132,7 @@ class LanguagesController extends Controller
 
         $language->update($request->all());
 
-        // Flush cache
-        cache()->tags([
-            $this->cacheTag
-        ])->flush();
+        $this->clearCache();
 
         return redirect()->back()->withSuccess('Successfully updated!');
     }
@@ -150,15 +144,30 @@ class LanguagesController extends Controller
     public function destroy(Language $language)
     {
         $language->delete(); // Soft delete
-        
-        // Flush cache
-        cache()->tags([
-            $this->cacheTag
-        ])->flush();
+
+        $this->clearCache();
 
         return response()->json([
             'state' => 'success'
         ]);
+    }
+
+    /**
+     *
+     */
+    private function clearCache()
+    {
+        $isRedis = config('cache.default') == 'redis';
+
+        if ($isRedis) {
+            // Flush only tagged cache
+            cache()->tags([$this->cacheTag])->flush();
+            info('Netcore/Translator cleared cache tag ' . $this->cacheTag);
+        } else {
+            // Flush all cache
+            cache()->flush();
+            info('Netcore/Translator cleared all cache globally');
+        }
     }
 
     /**
@@ -179,13 +188,15 @@ class LanguagesController extends Controller
                 $fallbackTranslations = Translation::whereLocale($fallbackIsoCode)->get();
 
                 if ($fallbackTranslations) {
-                    $copiedTranslationsWithNewLocale = $fallbackTranslations->map(function ($translation) use ($newLocale) {
+                    $copiedTranslationsWithNewLocale = $fallbackTranslations->map(function ($translation) use (
+                        $newLocale
+                    ) {
                         unset($translation->id);
                         $translation->locale = mb_strtolower($newLocale);
 
                         return $translation;
                     })->toArray();
-                    
+
                     $translationsToCreate = [];
 
                     foreach ($copiedTranslationsWithNewLocale as $translation) {
@@ -197,8 +208,8 @@ class LanguagesController extends Controller
                             ->where('key', $translation['key'])
                             ->where('locale', $translation['locale'])
                             ->first();
-                        
-                        if(!$exists) {
+
+                        if (!$exists) {
                             $translationsToCreate[] = $translation;
                         }
                     }
