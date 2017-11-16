@@ -12,7 +12,7 @@
                 <div class="panel-heading">
                     <div class="panel-heading-btn">
                         <a href="{{ route('admin.languages.create')  }}"
-                           class="btn btn-xs btn-success">{{ array_get($uiTranslations, 'create') }}</a>
+                           class="btn btn-xs btn-success"><i class="fa fa-plus"></i> {{ array_get($uiTranslations, 'create') }}</a>
                     </div>
 
                     <h4 class="panel-title">
@@ -68,4 +68,7 @@
                         </tbody>
                     </table>
                 </div>
+            </div>
+        </div>
+    </div>
 @endsection
