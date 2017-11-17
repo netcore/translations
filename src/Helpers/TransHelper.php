@@ -10,6 +10,11 @@ class TransHelper
 {
 
     /**
+     * @var
+     */
+    private static $cachedAllLanguages;
+
+    /**
      * @return Language
      */
     public static function getLanguage()
@@ -85,6 +90,10 @@ class TransHelper
      */
     public static function getAllLanguages(): Collection
     {
+        if(self::$cachedAllLanguages !== null) {
+            return self::$cachedAllLanguages;
+        }
+
         $languages = collect();
         if (Schema::hasTable('languages')) {
             $languages = \Netcore\Translator\Models\Language::all();
@@ -99,6 +108,8 @@ class TransHelper
                 ])
             ]);
         }
+
+        self::$cachedAllLanguages = $languages;
 
         return $languages;
     }
