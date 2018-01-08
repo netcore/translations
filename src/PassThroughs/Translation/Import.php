@@ -219,8 +219,8 @@ class Import extends PassThrough
             if($overrideOldTranslations) {
                 $xNewKeysWereFound = array_get(
                     $uiTranslations,
-                    'x_new_keys_were_found',
-                    ':count new modified to the system!'
+                    'x_keys_were_modified',
+                    ':count keys modified in the system!'
                 );
             } else {
                 $xNewKeysWereFound = array_get(
