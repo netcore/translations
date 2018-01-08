@@ -161,7 +161,7 @@ class Import extends PassThrough
      */
     private function newTranslations($parsedTranslations)
     {
-        $overrideOldTranslations = config('override_old_translations', false);
+        $overrideOldTranslations = config('translations.override_old_translations', false);
 
         $fieldsToSelect = [
             'locale',
@@ -213,8 +213,8 @@ class Import extends PassThrough
     {
         $response = [];
         $uiTranslations = config('translations.ui_translations.translations', []);
-        $overrideOldTranslations = config('override_old_translations', false);
-        
+        $overrideOldTranslations = config('translations.override_old_translations', false);
+
         if($newKeysCount) {
             if($overrideOldTranslations) {
                 $xNewKeysWereFound = array_get(
@@ -251,7 +251,7 @@ class Import extends PassThrough
 
         session()->flash('success', $response);
     }
-    
+
     /**
      *
      */
