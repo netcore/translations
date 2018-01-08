@@ -161,6 +161,8 @@ class Import extends PassThrough
      */
     private function newTranslations($parsedTranslations)
     {
+        $overrideOldTranslations = config('override_old_translations', false);
+
         $fieldsToSelect = [
             'locale',
             'group',
@@ -175,20 +177,23 @@ class Import extends PassThrough
 
         $existing = Translation::select($fieldsToSelect)->get();
         $newTranslations = [];
+        $exists = false;
 
         foreach ($parsedTranslations as $parsedTranslation) {
 
-            $existsQuery = $existing
-                ->where('locale', $parsedTranslation['locale'])
-                ->where('group', $parsedTranslation['group'])
-                ->where('key', $parsedTranslation['key']);
+            if(!$overrideOldTranslations) {
+                $existsQuery = $existing
+                    ->where('locale', $parsedTranslation['locale'])
+                    ->where('group', $parsedTranslation['group'])
+                    ->where('key', $parsedTranslation['key']);
 
-            if ($callableDomainId) {
-                $existsQuery = $existsQuery
-                    ->where('domain_id', domain_id());
+                if ($callableDomainId) {
+                    $existsQuery = $existsQuery
+                        ->where('domain_id', domain_id());
+                }
+
+                $exists = $existsQuery->first();
             }
-
-            $exists = $existsQuery->first();
 
             if ($exists == false) {
                 $newTranslations[] = $parsedTranslation;
@@ -208,13 +213,23 @@ class Import extends PassThrough
     {
         $response = [];
         $uiTranslations = config('translations.ui_translations.translations', []);
+        $overrideOldTranslations = config('override_old_translations', false);
         
         if($newKeysCount) {
-            $xNewKeysWereFound = array_get(
-                $uiTranslations,
-                'x_new_keys_were_found',
-                ':count new keys added to system!'
-            );
+            if($overrideOldTranslations) {
+                $xNewKeysWereFound = array_get(
+                    $uiTranslations,
+                    'x_new_keys_were_found',
+                    ':count new modified to the system!'
+                );
+            } else {
+                $xNewKeysWereFound = array_get(
+                    $uiTranslations,
+                    'x_new_keys_were_found',
+                    ':count new keys added to the system!'
+                );
+            }
+
             $response[] = str_replace(':count', $newKeysCount, $xNewKeysWereFound);
         } else {
             $noNewKeysWereFound = array_get(

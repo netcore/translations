@@ -1,20 +1,20 @@
 <?php
 
 return [
-    
+
     'api' => [
-        
+
         /**
-         * 
+         *
          * You can expose API that returns all translations.
          * Normally translations can be public, but if you want this API to
          * be protected by a secret password, then you can set it here.
-         * 
+         *
          * NULL means that there is no password and API is public.
-         * 
+         *
          */
         'secret' => env('NETCORE_TRANSLATIONS_SECRET'),
-        
+
         'download_from' => env('NETCORE_TRANSLATIONS_DOWNLOAD_FROM')
     ],
 
@@ -99,4 +99,8 @@ return [
     // But won't be copied in database. You can set this to "true" and translations will
     // Be copied from fallback language and taken from database
     'copy_translations_from_fallback' => true,
+
+
+    // False means when importing new translations existing keys will not be touched.
+    'override_old_translations'       => false
 ];
