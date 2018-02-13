@@ -102,5 +102,9 @@ return [
 
 
     // False means when importing new translations existing keys will not be touched.
-    'override_old_translations'       => false
+    'override_old_translations'       => false,
+
+    // True means that by passing third or fourth argument to lg function will create translation in database.
+    // It is not recommended to use it in production because it can slow down page
+    'create_translations_on_the_fly' => false,
 ];

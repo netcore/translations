@@ -1,6 +1,7 @@
 <?php namespace Netcore\Translator;
 
 use Illuminate\Contracts\View\View;
+use Illuminate\Support\Facades\Blade;
 use Illuminate\Translation\TranslationServiceProvider;
 use Netcore\Translator\Commands\DownloadTranslations;
 use Netcore\Translator\Helpers\TransHelper;
@@ -55,22 +56,22 @@ class ServiceProvider extends TranslationServiceProvider
 
         // Migrations
         $this->loadMigrationsFrom(__DIR__.'/migrations');
-        
+
         // View composers
         view()->composer($viewNamespace.'::*', function(View $view) use ($viewNamespace) {
             $view->with(compact('viewNamespace'));
         });
-        
+
         view()->composer($viewNamespace.'::languages.*', function(View $view) {
             $uiTranslations = config('translations.ui_translations.languages', []);
             $view->with(compact('uiTranslations'));
         });
-        
+
         view()->composer($viewNamespace.'::translations.*', function(View $view) {
             $uiTranslations = config('translations.ui_translations.translations', []);
             $view->with(compact('uiTranslations'));
         });
-        
+
         view()->composer($viewNamespace.'::partials.*', function(View $view) {
             $uiTranslations = config('translations.ui_translations.partials', []);
             $view->with(compact('uiTranslations'));
@@ -80,6 +81,10 @@ class ServiceProvider extends TranslationServiceProvider
         $this->commands([
             DownloadTranslations::class
         ]);
+
+        Blade::directive('lg', function ($expression) {
+            return "<?php echo lg($expression); ?>";
+        });
 
         // Global helpers
         require_once __DIR__ . '/Helpers/Global.php';
