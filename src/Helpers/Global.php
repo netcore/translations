@@ -41,20 +41,23 @@ if (!function_exists('lg')) {
      * @param $value
      * @return String
      */
-    function lg($key, array $replace = [], $locale = null, $value = null): String
+    function lg($key, $replace = [], $locale = null, $value = null): String
     {
         $createTranslations = config('translations.create_translations_on_the_fly', false);
-
         if ($createTranslations) {
+
             $translations = cache('translations');
             $languages = languages();
-            if (isset($locale) && !$languages->where('iso_code', $locale)) {
+            if (isset($locale) && !$languages->where('iso_code', $locale)->count()) {
                 $value = $locale;
+            }
+            if(!$locale && !$value && !is_array($replace)) {
+                $value = $replace;
             }
             $fallbackIsoCode = $languages->where('is_fallback', 1)->first()->iso_code;
             $transKey = $fallbackIsoCode . '.' . $key;
 
-            if (!isset($translations[$transKey]) && isset($value)) {
+            if (!isset($translations[$transKey])) {
                 $translations = [
                     'key' => $key,
                 ];
@@ -68,6 +71,10 @@ if (!function_exists('lg')) {
 
                 cache()->forget('translations');
             }
+        }
+
+        if(!is_array($replace)) {
+            $replace = [];
         }
 
         return trans($key, $replace, $locale);
