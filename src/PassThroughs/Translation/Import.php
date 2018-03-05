@@ -2,6 +2,7 @@
 
 namespace Netcore\Translator\PassThroughs\Translation;
 
+use Illuminate\Support\Facades\DB;
 use Netcore\Translator\PassThroughs\PassThrough;
 use Netcore\Translator\Models\Translation;
 use Netcore\Translator\Models\Language;
@@ -18,7 +19,6 @@ class Import extends PassThrough
     private $existingKeysCount = 0;
 
     /**
-     *
      * 1. Parse excel file and create a collection of all entries in that file
      * 2. Determine which keys already exist in DB via some collection magic (dont fire endless queries)
      * 3. Delete from DB those keys that already exist there
@@ -31,12 +31,16 @@ class Import extends PassThrough
      *    1) x new keys were found. These were added.
      *    2) x keys already exist. These were not changed.
      *
-     * @param array $allData
+     *
+     * @param $allData
+     * @param bool $flashMessage
      * @return bool
+     * @throws \Exception
+     * @throws \Throwable
      */
-    public function process($allData)
+    public function process($allData, $flashMessage = true)
     {
-        \DB::transaction(function () use ($allData) {
+        DB::transaction(function () use ($allData, $flashMessage) {
 
             // 1.
             $parsedTranslations = $this->parsedTranslations($allData);
@@ -49,11 +53,13 @@ class Import extends PassThrough
                 Translation::insert($chunk);
             }
 
-            // 4.
-            $localesCount = Language::pluck('iso_code')->count();
-            $newKeysCount = round(count($newTranslations) / $localesCount);
-            $existingKeysCount = round($this->existingKeysCount / $localesCount);
-            $this->flashMessages($newKeysCount, $existingKeysCount);
+            if ($flashMessage) {
+                // 4.
+                $localesCount = Language::pluck('iso_code')->count();
+                $newKeysCount = round(count($newTranslations) / $localesCount);
+                $existingKeysCount = round($this->existingKeysCount / $localesCount);
+                $this->flashMessages($newKeysCount, $existingKeysCount);
+            }
         });
 
         $this->flushCache();
@@ -181,7 +187,7 @@ class Import extends PassThrough
 
         foreach ($parsedTranslations as $parsedTranslation) {
 
-            if(!$overrideOldTranslations) {
+            if (!$overrideOldTranslations) {
                 $existsQuery = $existing
                     ->where('locale', $parsedTranslation['locale'])
                     ->where('group', $parsedTranslation['group'])
@@ -215,8 +221,8 @@ class Import extends PassThrough
         $uiTranslations = config('translations.ui_translations.translations', []);
         $overrideOldTranslations = config('translations.override_old_translations', false);
 
-        if($newKeysCount) {
-            if($overrideOldTranslations) {
+        if ($newKeysCount) {
+            if ($overrideOldTranslations) {
                 $xNewKeysWereFound = array_get(
                     $uiTranslations,
                     'x_keys_were_modified',
@@ -240,7 +246,7 @@ class Import extends PassThrough
             $response[] = $noNewKeysWereFound;
         }
 
-        if($existingKeysCount) {
+        if ($existingKeysCount) {
             $xKeysAlreadyExist = array_get(
                 $uiTranslations,
                 'x_keys_already_exist',

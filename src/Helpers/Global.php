@@ -67,7 +67,7 @@ if (!function_exists('lg')) {
                 }
 
                 $translation = new Translation();
-                $translation->import()->process([$translations]);
+                $translation->import()->process([$translations], false);
 
                 cache()->forget('translations');
             }
