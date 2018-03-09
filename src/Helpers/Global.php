@@ -45,9 +45,8 @@ if (!function_exists('lg')) {
     {
         $createTranslations = config('translations.create_translations_on_the_fly', false);
         if ($createTranslations) {
-            $translationsKeyInCache = config('translations.translations_key_in_cache');
 
-            $translations = cache($translationsKeyInCache);
+            $translations = cache('translations');
             $languages = languages();
             if (isset($locale) && !$languages->where('iso_code', $locale)->count()) {
                 $value = $locale;
@@ -70,7 +69,7 @@ if (!function_exists('lg')) {
                 $translation = new Translation();
                 $translation->import()->process([$translations], false);
 
-                cache()->forget($translationsKeyInCache);
+                cache()->forget('translations');
 
                 if (!is_array($replace)) {
                     $replace = [];
