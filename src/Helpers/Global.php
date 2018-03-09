@@ -70,6 +70,16 @@ if (!function_exists('lg')) {
                 $translation->import()->process([$translations], false);
 
                 cache()->forget('translations');
+
+                if(!is_array($replace)) {
+                    $replace = [];
+                }
+                $translation = $value;
+                foreach($replace as $key => $value) {
+                    $translation = str_replace(':' . $key, $value, $translation);
+                }
+
+                return $translation;
             }
         }
 
