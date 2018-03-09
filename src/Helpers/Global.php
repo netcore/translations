@@ -52,7 +52,7 @@ if (!function_exists('lg')) {
             if (isset($locale) && !$languages->where('iso_code', $locale)->count()) {
                 $value = $locale;
             }
-            if(!$locale && !$value && !is_array($replace)) {
+            if (!$locale && !$value && !is_array($replace)) {
                 $value = $replace;
             }
             $fallbackIsoCode = $languages->where('is_fallback', 1)->first()->iso_code;
@@ -72,11 +72,11 @@ if (!function_exists('lg')) {
 
                 cache()->forget($translationsKeyInCache);
 
-                if(!is_array($replace)) {
+                if (!is_array($replace)) {
                     $replace = [];
                 }
                 $translation = $value;
-                foreach($replace as $key => $value) {
+                foreach ($replace as $key => $value) {
                     $translation = str_replace(':' . $key, $value, $translation);
                 }
 
@@ -84,7 +84,7 @@ if (!function_exists('lg')) {
             }
         }
 
-        if(!is_array($replace)) {
+        if (!is_array($replace)) {
             $replace = [];
         }
 
