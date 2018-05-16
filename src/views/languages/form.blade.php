@@ -1,7 +1,7 @@
 <div class="form-group{{ $errors->has('iso_code') ? ' has-error' : '' }}">
     <label class="col-md-4 control-label">{{ array_get($uiTranslations, 'iso_code') }}</label>
     <div class="col-md-4">
-        {!! Form::text('iso_code', null, ['class' => 'form-control']) !!}
+        {!! Form::text('iso_code', null, ['class' => 'form-control', 'readonly' => isset($language)]) !!}
     </div>
 </div>
 
