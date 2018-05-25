@@ -54,32 +54,36 @@ if (!function_exists('lg')) {
             if (!$locale && !$value && !is_array($replace)) {
                 $value = $replace;
             }
-            $fallbackIsoCode = $languages->where('is_fallback', 1)->first()->iso_code;
-            $transKey = $fallbackIsoCode . '.' . $key;
+            $fallbackLanguage = $languages->where('is_fallback', 1)->first();
 
-            if (!isset($translations[$transKey])) {
-                $translations = [
-                    'key' => $key,
-                ];
+            if($fallbackLanguage) {
+                $fallbackIsoCode = $fallbackLanguage->iso_code;
+                $transKey = $fallbackIsoCode . '.' . $key;
 
-                foreach ($languages->pluck('iso_code')->toArray() as $code) {
-                    $translations[$code] = $value;
+                if (!isset($translations[$transKey])) {
+                    $translations = [
+                        'key' => $key,
+                    ];
+
+                    foreach ($languages->pluck('iso_code')->toArray() as $code) {
+                        $translations[$code] = $value;
+                    }
+
+                    $translation = new Translation();
+                    $translation->import()->process([$translations], false);
+
+                    cache()->forget('translations');
+
+                    if (!is_array($replace)) {
+                        $replace = [];
+                    }
+                    $translation = $value;
+                    foreach ($replace as $key => $value) {
+                        $translation = str_replace(':' . $key, $value, $translation);
+                    }
+
+                    return $translation;
                 }
-
-                $translation = new Translation();
-                $translation->import()->process([$translations], false);
-
-                cache()->forget('translations');
-
-                if (!is_array($replace)) {
-                    $replace = [];
-                }
-                $translation = $value;
-                foreach ($replace as $key => $value) {
-                    $translation = str_replace(':' . $key, $value, $translation);
-                }
-
-                return $translation;
             }
         }
 
