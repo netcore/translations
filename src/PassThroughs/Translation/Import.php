@@ -48,9 +48,18 @@ class Import extends PassThrough
             // 2.
             $newTranslations = $this->newTranslations($parsedTranslations);
 
+
             // 3.
             foreach (array_chunk($newTranslations, 300) as $chunk) {
-                Translation::insert($chunk);
+                foreach($chunk as $item) {
+                    $tr = Translation::where('key', $item['key'])->where('locale', $item['locale'])->where('group', $item['group'])->first();
+                    if($tr) {
+                        $tr->value = $item['value'];
+                        $tr->save();
+                    } else {
+                        Translation::create($item);
+                    }
+                }
             }
 
             if ($flashMessage) {
