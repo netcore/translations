@@ -210,7 +210,7 @@ class Import extends PassThrough
                 $exists = $existsQuery->first();
             }
 
-            if ($exists == false) {
+            if (!$exists) {
                 $newTranslations[] = $parsedTranslation;
             } else {
                 $this->existingKeysCount++;
