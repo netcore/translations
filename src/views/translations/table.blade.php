@@ -113,7 +113,7 @@
                        data-type="textarea"
                        data-pk="{{ $t ? $t->id : 0 }}"
                        data-url="{{ $editUrl }}"
-                       data-title="{{ array_get($uiTranslations, 'provide_translation') }}">{{ $t ? htmlentities($t->value, ENT_QUOTES, 'UTF-8', false) : '' }}</a>
+                       data-title="{{ array_get($uiTranslations, 'provide_translation') }}">{{ $t ? $t->value : '' }}</a>
                 </td>
             @endforeach
 
